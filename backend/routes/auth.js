@@ -7,29 +7,35 @@ const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/register', async (req, res) => {
-  const { name, email, password, college } = req.body;
+router.post('/signup', async (req, res) => {
+  const { name, email, roll_no, year_no, sem_no, college_id, password } = req.body;
 
-  if (!name || !email || !password || !college) {
-    return res.status(400).json({ message: 'All fields are required' });
+  if (!name || !email || !roll_no || !year_no || !sem_no || !college_id || !password) {
+    return res.status(400).json({
+      message: 'name, email, roll_no, year_no, sem_no, college_id, password are required'
+    });
   }
 
   try {
-    const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
-    if (existing.length > 0) {
-      return res.status(409).json({ message: 'Email already registered' });
+    const [exists] = await db.execute('SELECT id FROM students WHERE email = ? OR roll_no = ?', [email, roll_no]);
+    if (exists.length > 0) {
+      return res.status(409).json({ message: 'Email or roll number already exists' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    await db.execute(
-      'INSERT INTO users (name, email, password_hash, college) VALUES (?, ?, ?, ?)',
-      [name, email, passwordHash, college]
+    const [studentResult] = await db.execute(
+      'INSERT INTO students (name, roll_no, email, year_no, sem_no, college_id) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, roll_no, email, year_no, sem_no, college_id]
     );
 
-    return res.status(201).json({ message: 'Registration successful' });
+    const studentId = studentResult.insertId;
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await db.execute('INSERT INTO user_accounts (student_id, password_hash) VALUES (?, ?)', [studentId, passwordHash]);
+
+    return res.status(201).json({ message: 'Signup successful' });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Failed to register user' });
+    return res.status(500).json({ message: 'Failed to signup' });
   }
 });
 
@@ -37,12 +43,26 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
+    return res.status(400).json({ message: 'email and password are required' });
   }
 
   try {
     const [rows] = await db.execute(
-      'SELECT id, name, email, password_hash, college, is_verified FROM users WHERE email = ?',
+      `SELECT
+         s.id AS student_id,
+         s.name,
+         s.email,
+         s.roll_no,
+         s.year_no,
+         s.sem_no,
+         s.college_id,
+         c.name AS college,
+         ua.id AS account_id,
+         ua.password_hash
+       FROM students s
+       JOIN user_accounts ua ON ua.student_id = s.id
+       JOIN college c ON c.id = s.college_id
+       WHERE s.email = ?`,
       [email]
     );
 
@@ -58,7 +78,12 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      {
+        accountId: user.account_id,
+        studentId: user.student_id,
+        email: user.email,
+        name: user.name
+      },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -66,11 +91,14 @@ router.post('/login', async (req, res) => {
     return res.json({
       token,
       user: {
-        id: user.id,
+        student_id: user.student_id,
         name: user.name,
         email: user.email,
-        college: user.college,
-        is_verified: Boolean(user.is_verified)
+        roll_no: user.roll_no,
+        year_no: user.year_no,
+        sem_no: user.sem_no,
+        college_id: user.college_id,
+        college: user.college
       }
     });
   } catch (error) {
@@ -82,8 +110,19 @@ router.post('/login', async (req, res) => {
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.execute(
-      'SELECT id, name, email, college, is_verified, created_at FROM users WHERE id = ?',
-      [req.user.id]
+      `SELECT
+         s.id AS student_id,
+         s.name,
+         s.email,
+         s.roll_no,
+         s.year_no,
+         s.sem_no,
+         s.college_id,
+         c.name AS college
+       FROM students s
+       JOIN college c ON c.id = s.college_id
+       WHERE s.id = ?`,
+      [req.user.studentId]
     );
 
     if (rows.length === 0) {

@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
+const authRoutes = require('./routes/auth');
 const academicRoutes = require('./routes/academic');
 const professorRoutes = require('./routes/professors');
 const ratingsRoutes = require('./routes/ratings');
@@ -23,6 +24,7 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/academic', academicRoutes);
 app.use('/api/professors', professorRoutes);
 app.use('/api/ratings', ratingsRoutes);

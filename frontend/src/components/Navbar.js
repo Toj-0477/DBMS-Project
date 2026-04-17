@@ -1,8 +1,8 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
-  const { isAuthenticated, isVerified, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
 
   const onLogout = () => {
@@ -18,7 +18,7 @@ function Navbar() {
         padding: '14px 16px',
         position: 'sticky',
         top: 0,
-        zIndex: 5
+        zIndex: 10
       }}
     >
       <div
@@ -26,30 +26,19 @@ function Navbar() {
           maxWidth: 1100,
           margin: '0 auto',
           display: 'flex',
-          alignItems: 'center',
           justifyContent: 'space-between',
-          gap: 16,
+          alignItems: 'center',
+          gap: 12,
           flexWrap: 'wrap'
         }}
       >
-        <Link to="/" style={{ color: '#fff', fontWeight: 800, fontSize: '1.1rem', textDecoration: 'none' }}>
-          IN <span style={{ color: '#ffd700' }}>|</span> Rate My Professor
+        <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontWeight: 800 }}>
+          SVKM Professor Feedback
         </Link>
 
-        <nav style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
-          <NavLink to="/search" style={{ color: '#fff' }}>
-            Search
-          </NavLink>
-          {isAuthenticated && !isVerified && (
-            <NavLink to="/verify-id" style={{ color: '#ffd700' }}>
-              Verify ID
-            </NavLink>
-          )}
-          {isAuthenticated && isVerified && (
-            <NavLink to="/add-professor" style={{ color: '#fff' }}>
-              Add Professor
-            </NavLink>
-          )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          {isAuthenticated && user ? <span style={{ color: '#ddd' }}>Hi, {user.name}</span> : null}
+
           {!isAuthenticated ? (
             <>
               <Link to="/login" className="btn" style={{ background: '#232323', color: '#fff' }}>
@@ -64,7 +53,7 @@ function Navbar() {
               Logout
             </button>
           )}
-        </nav>
+        </div>
       </div>
     </header>
   );

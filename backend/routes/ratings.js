@@ -1,6 +1,7 @@
 const express = require('express');
 
 const db = require('../config/db');
+const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -11,12 +12,13 @@ function containsProfanity(text) {
   return blockedTerms.some((word) => normalized.includes(word));
 }
 
-router.post('/', async (req, res) => {
-  const { student_id, professor_id, course_id, term, stars, comment } = req.body;
+router.post('/', authMiddleware, async (req, res) => {
+  const { professor_id, course_id, term, stars, comment } = req.body;
+  const studentId = req.user.studentId;
 
-  if (!student_id || !professor_id || !course_id || !term || !stars) {
+  if (!studentId || !professor_id || !course_id || !term || !stars) {
     return res.status(400).json({
-      message: 'student_id, professor_id, course_id, term, stars are required'
+      message: 'professor_id, course_id, term, stars are required'
     });
   }
 
@@ -42,7 +44,7 @@ router.post('/', async (req, res) => {
 
     const [enrollmentRows] = await db.execute(
       'SELECT id FROM enrollments WHERE student_id = ? AND course_id = ? AND term = ?',
-      [student_id, course_id, term]
+      [studentId, course_id, term]
     );
 
     if (enrollmentRows.length === 0) {
@@ -53,7 +55,7 @@ router.post('/', async (req, res) => {
       `INSERT INTO ratings
        (student_id, professor_id, course_id, term, stars, comment)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [student_id, professor_id, course_id, term, cleanStars, cleanComment || null]
+      [studentId, professor_id, course_id, term, cleanStars, cleanComment || null]
     );
 
     return res.status(201).json({ message: 'Rating submitted', id: result.insertId });

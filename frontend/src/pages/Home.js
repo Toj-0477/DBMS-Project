@@ -1,51 +1,52 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import SearchBar from '../components/SearchBar';
 import ProfessorCard from '../components/ProfessorCard';
+import { useAuth } from '../context/AuthContext';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function Home() {
+  const { isAuthenticated } = useAuth();
   const [professors, setProfessors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    async function loadFeatured() {
+    async function loadProfessors() {
+      setLoading(true);
+      setError('');
       try {
         const response = await axios.get(`${API_BASE}/professors`);
-        setProfessors(response.data.professors.slice(0, 6));
+        setProfessors(response.data.professors || []);
       } catch (_error) {
+        setError('Could not load professors');
         setProfessors([]);
       } finally {
         setLoading(false);
       }
     }
 
-    loadFeatured();
+    loadProfessors();
   }, []);
 
   return (
     <section>
       <div className="card" style={{ padding: 24, marginBottom: 24 }}>
-        <h1 className="page-title">Find the right professor across SVKM colleges</h1>
+        <h1 className="page-title">Professor List</h1>
         <p className="page-subtitle">
-          Anonymous, student-driven ratings. Sign up, verify your ID, and help others choose wisely.
+          View professors with college, department and current average rating. Use GiveFeedback after login.
         </p>
-        <SearchBar />
       </div>
 
-      <h2 style={{ marginBottom: 12 }}>Top Rated Professors</h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : professors.length === 0 ? (
-        <p>No professors yet. Be the first to add one.</p>
-      ) : (
-        <div style={{ display: 'grid', gap: 12 }}>
-          {professors.map((professor) => (
-            <ProfessorCard key={professor.id} professor={professor} />
-          ))}
-        </div>
-      )}
+      {loading ? <p>Loading professors...</p> : null}
+      {!loading && error ? <p style={{ color: '#b00020' }}>{error}</p> : null}
+      {!loading && !error && professors.length === 0 ? <p>No professors found.</p> : null}
+
+      <div style={{ display: 'grid', gap: 12 }}>
+        {professors.map((professor) => (
+          <ProfessorCard key={professor.id} professor={professor} isAuthenticated={isAuthenticated} />
+        ))}
+      </div>
     </section>
   );
 }

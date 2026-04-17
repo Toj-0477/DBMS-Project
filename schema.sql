@@ -5,6 +5,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS enrollments;
 DROP TABLE IF EXISTS teaches;
+DROP TABLE IF EXISTS user_accounts;
 DROP TABLE IF EXISTS students;
 DROP TABLE IF EXISTS professors;
 DROP TABLE IF EXISTS courses;
@@ -25,8 +26,17 @@ CREATE TABLE students (
   roll_no VARCHAR(30) NOT NULL UNIQUE,
   email VARCHAR(120) UNIQUE,
   year_no INT,
+  sem_no INT,
   college_id INT NOT NULL,
   FOREIGN KEY (college_id) REFERENCES college(id)
+);
+
+CREATE TABLE user_accounts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (student_id) REFERENCES students(id)
 );
 
 CREATE TABLE professors (
@@ -112,13 +122,13 @@ INSERT INTO courses (code, name, sem_no, credits, college_id) VALUES
 ('BA210', 'Marketing Fundamentals', 3, 3, 4),
 ('FN305', 'Investment Analysis', 5, 4, 5);
 
-INSERT INTO students (name, roll_no, email, year_no, college_id) VALUES
-('Aarav Shah', 'NM001', 'aarav@nmims.edu', 2, 1),
-('Riya Patel', 'NM002', 'riya@nmims.edu', 2, 1),
-('Kabir Nair', 'MP001', 'kabir@mpstme.edu', 3, 2),
-('Anaya Joshi', 'DJ001', 'anaya@djsce.edu', 2, 3),
-('Neha Kapoor', 'SO001', 'neha@soba.edu', 2, 4),
-('Vikram Rao', 'AM001', 'vikram@amsoc.edu', 3, 5);
+INSERT INTO students (name, roll_no, email, year_no, sem_no, college_id) VALUES
+('Aarav Shah', 'NM001', 'aarav@nmims.edu', 2, 4, 1),
+('Riya Patel', 'NM002', 'riya@nmims.edu', 2, 4, 1),
+('Kabir Nair', 'MP001', 'kabir@mpstme.edu', 3, 6, 2),
+('Anaya Joshi', 'DJ001', 'anaya@djsce.edu', 2, 4, 3),
+('Neha Kapoor', 'SO001', 'neha@soba.edu', 2, 4, 4),
+('Vikram Rao', 'AM001', 'vikram@amsoc.edu', 3, 6, 5);
 
 INSERT INTO teaches (professor_id, course_id, term) VALUES
 (1, 1, '2026-SEM2'),

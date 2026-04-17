@@ -11,7 +11,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchCurrentUser() {
+    async function loadMe() {
       if (!token) {
         setUser(null);
         setLoading(false);
@@ -32,15 +32,13 @@ export function AuthProvider({ children }) {
       }
     }
 
-    fetchCurrentUser();
+    loadMe();
   }, [token]);
 
-  const login = (newToken, userPayload) => {
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
-    if (userPayload) {
-      setUser(userPayload);
-    }
+  const login = (nextToken, userPayload) => {
+    localStorage.setItem('token', nextToken);
+    setToken(nextToken);
+    setUser(userPayload || null);
   };
 
   const logout = () => {
@@ -56,8 +54,7 @@ export function AuthProvider({ children }) {
       loading,
       login,
       logout,
-      isAuthenticated: Boolean(token),
-      isVerified: Boolean(user && user.is_verified)
+      isAuthenticated: Boolean(token)
     }),
     [token, user, loading]
   );

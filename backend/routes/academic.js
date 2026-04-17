@@ -17,7 +17,7 @@ router.get('/colleges', async (_req, res) => {
 router.get('/students', async (_req, res) => {
   try {
     const [rows] = await db.execute(
-      `SELECT s.id, s.name, s.roll_no, s.email, s.year_no, c.name AS college
+      `SELECT s.id, s.name, s.roll_no, s.email, s.year_no, s.sem_no, c.name AS college
        FROM students s
        JOIN college c ON c.id = s.college_id
        ORDER BY s.name`
@@ -30,7 +30,7 @@ router.get('/students', async (_req, res) => {
 });
 
 router.post('/students', async (req, res) => {
-  const { name, roll_no, email, year_no, college_id } = req.body;
+  const { name, roll_no, email, year_no, sem_no, college_id } = req.body;
 
   if (!name || !roll_no || !college_id) {
     return res.status(400).json({ message: 'name, roll_no, college_id are required' });
@@ -38,8 +38,8 @@ router.post('/students', async (req, res) => {
 
   try {
     const [result] = await db.execute(
-      'INSERT INTO students (name, roll_no, email, year_no, college_id) VALUES (?, ?, ?, ?, ?)',
-      [name, roll_no, email || null, year_no || null, college_id]
+      'INSERT INTO students (name, roll_no, email, year_no, sem_no, college_id) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, roll_no, email || null, year_no || null, sem_no || null, college_id]
     );
     return res.status(201).json({ message: 'Student created', id: result.insertId });
   } catch (error) {
