@@ -1,6 +1,3 @@
--- Academic schema
--- Students are the only users; auth lives directly on the students table.
-
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS ratings;
@@ -13,66 +10,66 @@ DROP TABLE IF EXISTS college;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE college (
-  id           INT AUTO_INCREMENT PRIMARY KEY,
-  name         VARCHAR(100) NOT NULL UNIQUE,
+  id  INT AUTO_INCREMENT PRIMARY KEY,
+  name  VARCHAR(100) NOT NULL UNIQUE,
   parent_group VARCHAR(50)  NOT NULL DEFAULT 'SVKM'
 );
 
 CREATE TABLE professors (
-  id         INT AUTO_INCREMENT PRIMARY KEY,
-  name       VARCHAR(100) NOT NULL,
-  email      VARCHAR(120) UNIQUE,
-  dept       VARCHAR(80),
+  id  INT AUTO_INCREMENT PRIMARY KEY,
+  name  VARCHAR(100) NOT NULL,
+  email  VARCHAR(120) UNIQUE,
+  dept  VARCHAR(80),
   college_id INT NOT NULL,
   FOREIGN KEY (college_id) REFERENCES college(id)
 );
 
--- One professor per course; use professor_id directly
+
 CREATE TABLE courses (
-  id           INT AUTO_INCREMENT PRIMARY KEY,
-  code         VARCHAR(20)  NOT NULL UNIQUE,
-  name         VARCHAR(120) NOT NULL,
-  sem_no       INT,
-  credits      INT,
-  college_id   INT NOT NULL,
+  id  INT AUTO_INCREMENT PRIMARY KEY,
+  code  VARCHAR(20)  NOT NULL UNIQUE,
+  name  VARCHAR(120) NOT NULL,
+  sem_no INT,
+  credits  INT,
+  college_id INT NOT NULL,
   professor_id INT NOT NULL,
   FOREIGN KEY (college_id)   REFERENCES college(id),
   FOREIGN KEY (professor_id) REFERENCES professors(id)
 );
 
 CREATE TABLE students (
-  id          INT AUTO_INCREMENT PRIMARY KEY,
-  name        VARCHAR(100) NOT NULL,
-  roll_no     VARCHAR(30)  NOT NULL UNIQUE,
-  email       VARCHAR(120) UNIQUE,
-  password    VARCHAR(100) NOT NULL,
-  year_no     INT,
-  sem_no      INT,
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  roll_no VARCHAR(30)  NOT NULL UNIQUE,
+  email VARCHAR(120) UNIQUE,
+  password VARCHAR(100) NOT NULL,
+  year_no INT,
+  sem_no INT,
   college_id  INT NOT NULL,
   is_verified BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (college_id) REFERENCES college(id)
 );
 
 CREATE TABLE enrollments (
-  id         INT AUTO_INCREMENT PRIMARY KEY,
-  student_id INT         NOT NULL,
-  course_id  INT         NOT NULL,
-  term       VARCHAR(20) NOT NULL,
-  status     VARCHAR(20) NOT NULL DEFAULT 'active',
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL,
+  course_id  INT NOT NULL,
+  term VARCHAR(20) NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'active',
   UNIQUE (student_id, course_id, term),
   FOREIGN KEY (student_id) REFERENCES students(id),
   FOREIGN KEY (course_id)  REFERENCES courses(id)
 );
 
 CREATE TABLE ratings (
-  id           INT AUTO_INCREMENT PRIMARY KEY,
-  student_id   INT         NOT NULL,
-  professor_id INT         NOT NULL,
-  course_id    INT         NOT NULL,
-  term         VARCHAR(20) NOT NULL,
-  stars        TINYINT     NOT NULL,
-  comment      VARCHAR(300),
-  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id   INT NOT NULL,
+  professor_id INT NOT NULL,
+  course_id    INT NOT NULL,
+  term VARCHAR(20) NOT NULL,
+  stars TINYINT NOT NULL,
+  comment VARCHAR(300),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (student_id, professor_id, course_id, term),
   FOREIGN KEY (student_id)   REFERENCES students(id),
   FOREIGN KEY (professor_id) REFERENCES professors(id),
@@ -80,13 +77,15 @@ CREATE TABLE ratings (
   CHECK (stars BETWEEN 1 AND 5)
 );
 
--- Demo data
+
+-- Dummy Data
+
 INSERT INTO college (name, parent_group) VALUES
-('NMIMS',      'SVKM'),
-('MPSTME',     'SVKM'),
+('NMIMS','SVKM'),
+('MPSTME','SVKM'),
 ('DJ Sanghvi', 'SVKM'),
-('SOBA',       'SVKM'),
-('AMSOC',      'SVKM');
+('SOBA','SVKM'),
+('AMSOC','SVKM');
 
 INSERT INTO professors (name, email, dept, college_id) VALUES
 ('Dr Mehta',      'mehta@nmims.edu',    'Computer',    1),
