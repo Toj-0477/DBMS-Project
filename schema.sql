@@ -1,6 +1,3 @@
--- Academic schema
--- Students are the only users; auth lives directly on the students table.
-
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS ratings;
@@ -27,7 +24,7 @@ CREATE TABLE professors (
   FOREIGN KEY (college_id) REFERENCES college(id)
 );
 
--- One professor per course; use professor_id directly
+
 CREATE TABLE courses (
   id           INT AUTO_INCREMENT PRIMARY KEY,
   code         VARCHAR(20)  NOT NULL UNIQUE,
@@ -80,7 +77,7 @@ CREATE TABLE ratings (
   CHECK (stars BETWEEN 1 AND 5)
 );
 
--- Demo data
+
 INSERT INTO college (name, parent_group) VALUES
 ('NMIMS',      'SVKM'),
 ('MPSTME',     'SVKM'),
