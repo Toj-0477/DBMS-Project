@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
+=======
+show databases;
+USE svkm_academic;
+
+>>>>>>> Stashed changes
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS ratings;
@@ -24,7 +30,10 @@ CREATE TABLE professors (
   FOREIGN KEY (college_id) REFERENCES college(id)
 );
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 CREATE TABLE courses (
   id  INT AUTO_INCREMENT PRIMARY KEY,
   code  VARCHAR(20)  NOT NULL UNIQUE,
@@ -77,8 +86,12 @@ CREATE TABLE ratings (
   CHECK (stars BETWEEN 1 AND 5)
 );
 
+<<<<<<< Updated upstream
 
 -- Dummy Data
+=======
+-- Dumyy adta
+>>>>>>> Stashed changes
 
 INSERT INTO college (name, parent_group) VALUES
 ('NMIMS','SVKM'),
@@ -124,3 +137,58 @@ INSERT INTO ratings (student_id, professor_id, course_id, term, stars, comment) 
 (4, 3, 3, '2026-SEM2', 4, 'Concepts explained well'),
 (5, 4, 4, '2026-SEM2', 3, 'Good but assignment heavy'),
 (6, 5, 5, '2026-SEM2', 4, 'Useful for exam preparation');
+<<<<<<< Updated upstream
+=======
+
+
+-- sampel comamds
+
+SHOW TABLES;
+
+SELECT * FROM college;
+SELECT * FROM professors;
+SELECT * FROM courses;
+SELECT * FROM students;
+SELECT * FROM enrollments;
+SELECT * FROM ratings;
+
+DESCRIBE students;
+DESCRIBE courses;
+
+SELECT * FROM students WHERE sem_no = 4;
+SELECT * FROM professors WHERE dept = 'Computer';
+SELECT * FROM courses ORDER BY credits DESC;
+
+-- student to clg
+SELECT s.name, s.roll_no, c.name AS college
+FROM students s
+JOIN college c ON s.college_id = c.id;
+
+-- prof to course
+SELECT c.name AS course, p.name AS professor
+FROM courses c
+JOIN professors p ON c.professor_id = p.id;
+
+-- stu enrollss
+SELECT s.name AS student, c.name AS course, e.term
+FROM enrollments e
+JOIN students s ON e.student_id = s.id
+JOIN courses c ON e.course_id = c.id;
+
+-- prof rating
+SELECT p.name, AVG(r.stars) AS avg_rating
+FROM ratings r
+JOIN professors p ON r.professor_id = p.id
+GROUP BY p.name;
+
+-- stu to prof w login creds for debugging.
+SELECT 
+  s.name AS student_name,
+  p.name AS professor_name,
+  s.email,
+  s.password
+FROM enrollments e
+JOIN students s ON e.student_id = s.id
+JOIN courses c ON e.course_id = c.id
+JOIN professors p ON c.professor_id = p.id;
+>>>>>>> Stashed changes
