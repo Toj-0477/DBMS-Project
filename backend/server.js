@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 
 const path = require('path');
 const express = require('express');
@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const academicRoutes = require('./routes/academic');
 const professorRoutes = require('./routes/professors');
 const ratingsRoutes = require('./routes/ratings');
+const analyticsRoutes = require('./routes/analytics');
 
 const app = express();
 const port = Number(process.env.PORT || 5000);
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/academic', academicRoutes);
 app.use('/api/professors', professorRoutes);
 app.use('/api/ratings', ratingsRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

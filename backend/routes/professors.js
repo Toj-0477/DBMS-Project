@@ -14,10 +14,15 @@ router.get('/', async (req, res) => {
         p.name,
         p.dept,
         c.name AS college,
+        COALESCE(
+          GROUP_CONCAT(DISTINCT CONCAT(cr.code, ' - ', cr.name) ORDER BY cr.code SEPARATOR ', '),
+          'NA'
+        ) AS courses,
         COALESCE(ROUND(AVG(r.stars), 2), 0) AS avg_stars,
         COUNT(r.id) AS rating_count
       FROM professors p
       JOIN college c ON c.id = p.college_id
+      LEFT JOIN courses cr ON cr.professor_id = p.id
       LEFT JOIN ratings r ON r.professor_id = p.id
     `;
     const params = [];

@@ -7,7 +7,8 @@ function ProfessorCard({ professor, isAuthenticated }) {
         <div>
           <h3 style={{ margin: '0 0 6px' }}>{professor.name}</h3>
           <p style={{ margin: '0 0 6px', color: '#666' }}>Dept: {professor.dept || 'NA'}</p>
-          <p style={{ margin: 0, color: '#666' }}>College: {professor.college}</p>
+          <p style={{ margin: '0 0 6px', color: '#666' }}>College: {professor.college}</p>
+          <p style={{ margin: 0, color: '#666' }}>Courses: {professor.courses || 'NA'}</p>
         </div>
 
         <div style={{ textAlign: 'right' }}>

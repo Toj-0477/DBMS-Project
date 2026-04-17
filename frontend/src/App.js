@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import RateProfessor from './pages/RateProfessor';
+import Analytics from './pages/Analytics';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/feedback/:id" element={<RateProfessor />} />
+          <Route path="/analytics" element={<Analytics />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

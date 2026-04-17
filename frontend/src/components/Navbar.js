@@ -37,6 +37,10 @@ function Navbar() {
         </Link>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <Link to="/analytics" className="btn" style={{ background: '#232323', color: '#fff' }}>
+            Analytics
+          </Link>
+
           {isAuthenticated && user ? <span style={{ color: '#ddd' }}>Hi, {user.name}</span> : null}
 
           {!isAuthenticated ? (

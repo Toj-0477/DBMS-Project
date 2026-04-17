@@ -34,7 +34,7 @@ function Home() {
       <div className="card" style={{ padding: 24, marginBottom: 24 }}>
         <h1 className="page-title">Professor List</h1>
         <p className="page-subtitle">
-          View professors with college, department and current average rating. Use GiveFeedback after login.
+          View professors with college, department, courses, and current average rating. Use GiveFeedback after login.
         </p>
       </div>
 
