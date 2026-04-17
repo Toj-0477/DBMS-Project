@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS students;
 DROP TABLE IF EXISTS professors;
 DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS college;
+DROP TABLE IF EXISTS ratings;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -68,6 +69,23 @@ CREATE TABLE enrollments (
   UNIQUE (student_id, course_id, term),
   FOREIGN KEY (student_id) REFERENCES students(id),
   FOREIGN KEY (course_id) REFERENCES courses(id)
+);
+
+-- Student ratings for professor and course
+CREATE TABLE ratings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL,
+  professor_id INT NOT NULL,
+  course_id INT NOT NULL,
+  term VARCHAR(20) NOT NULL,
+  stars TINYINT NOT NULL,
+  comment VARCHAR(300),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (student_id, professor_id, course_id, term),
+  FOREIGN KEY (student_id) REFERENCES students(id),
+  FOREIGN KEY (professor_id) REFERENCES professors(id),
+  FOREIGN KEY (course_id) REFERENCES courses(id),
+  CHECK (stars BETWEEN 1 AND 5)
 );
 
 INSERT INTO college (name, parent_group) VALUES
