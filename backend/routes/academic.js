@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 
 const db = require('../config/db');
 
@@ -30,16 +31,17 @@ router.get('/students', async (_req, res) => {
 });
 
 router.post('/students', async (req, res) => {
-  const { name, roll_no, email, year_no, sem_no, college_id, course_id, password_hash } = req.body;
+  const { name, roll_no, email, password, year_no, sem_no, college_id } = req.body;
 
-  if (!name || !roll_no || !college_id || !course_id || !password_hash) {
-    return res.status(400).json({ message: 'name, roll_no, college_id, course_id, password_hash are required' });
+  if (!name || !roll_no || !college_id || !password) {
+    return res.status(400).json({ message: 'name, roll_no, college_id, password are required' });
   }
 
   try {
+    const passwordHash = await bcrypt.hash(password, 10);
     const [result] = await db.execute(
-      'INSERT INTO students (name, roll_no, email, password_hash, year_no, sem_no, college_id, course_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [name, roll_no, email || null, password_hash, year_no || null, sem_no || null, college_id, course_id]
+      'INSERT INTO students (name, roll_no, email, password, year_no, sem_no, college_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, roll_no, email || null, passwordHash, year_no || null, sem_no || null, college_id]
     );
     return res.status(201).json({ message: 'Student created', id: result.insertId });
   } catch (error) {

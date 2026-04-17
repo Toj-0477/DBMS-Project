@@ -8,11 +8,11 @@ const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/signup', async (req, res) => {
-  const { name, email, roll_no, year_no, sem_no, college_id, course_id, password } = req.body;
+  const { name, email, roll_no, year_no, sem_no, college_id, password } = req.body;
 
-  if (!name || !email || !roll_no || !year_no || !sem_no || !college_id || !course_id || !password) {
+  if (!name || !email || !roll_no || !year_no || !sem_no || !college_id || !password) {
     return res.status(400).json({
-      message: 'name, email, roll_no, year_no, sem_no, college_id, course_id, password are required'
+      message: 'name, email, roll_no, year_no, sem_no, college_id, password are required'
     });
   }
 
@@ -25,8 +25,8 @@ router.post('/signup', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const [studentResult] = await db.execute(
-      'INSERT INTO students (name, roll_no, email, password_hash, year_no, sem_no, college_id, course_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [name, roll_no, email, passwordHash, year_no, sem_no, college_id, course_id]
+      'INSERT INTO students (name, roll_no, email, password, year_no, sem_no, college_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, roll_no, email, passwordHash, year_no, sem_no, college_id]
     );
 
     return res.status(201).json({ message: 'Signup successful' });
@@ -53,9 +53,8 @@ router.post('/login', async (req, res) => {
          s.year_no,
          s.sem_no,
          s.college_id,
-         s.course_id,
          c.name AS college,
-         s.password_hash
+        s.password
        FROM students s
        JOIN college c ON c.id = s.college_id
        WHERE s.email = ?`,
@@ -67,7 +66,11 @@ router.post('/login', async (req, res) => {
     }
 
     const user = rows[0];
-    const match = await bcrypt.compare(password, user.password_hash);
+    const storedPassword = user.password || '';
+    const looksHashed = storedPassword.startsWith('$2a$') || storedPassword.startsWith('$2b$');
+    const match = looksHashed
+      ? await bcrypt.compare(password, storedPassword)
+      : password === storedPassword;
 
     if (!match) {
       return res.status(401).json({ message: 'Invalid credentials' });
@@ -93,7 +96,6 @@ router.post('/login', async (req, res) => {
         year_no: user.year_no,
         sem_no: user.sem_no,
         college_id: user.college_id,
-        course_id: user.course_id,
         college: user.college
       }
     });
@@ -114,7 +116,6 @@ router.get('/me', authMiddleware, async (req, res) => {
          s.year_no,
          s.sem_no,
          s.college_id,
-         s.course_id,
          c.name AS college
        FROM students s
        JOIN college c ON c.id = s.college_id

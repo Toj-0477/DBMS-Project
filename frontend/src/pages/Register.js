@@ -8,7 +8,6 @@ function Register() {
   const navigate = useNavigate();
 
   const [colleges, setColleges] = useState([]);
-  const [courses, setCourses] = useState([]);
   
   const [form, setForm] = useState({
     name: '',
@@ -17,7 +16,6 @@ function Register() {
     year_no: '',
     sem_no: '',
     college_id: '',
-    course_id: '',
     password: ''
   });
   
@@ -27,25 +25,18 @@ function Register() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [collegeRes, courseRes] = await Promise.all([
-          axios.get(`${API_BASE}/academic/colleges`),
-          axios.get(`${API_BASE}/academic/courses`)
-        ]);
+        const [collegeRes] = await Promise.all([axios.get(`${API_BASE}/academic/colleges`)]);
         
         const collegeRows = collegeRes.data.colleges || [];
-        const courseRows = courseRes.data.courses || [];
         
         setColleges(collegeRows);
-        setCourses(courseRows);
         
         setForm((prev) => ({ 
           ...prev, 
-          college_id: collegeRows.length > 0 ? String(collegeRows[0].id) : '',
-          course_id: courseRows.length > 0 ? String(courseRows[0].id) : ''
+          college_id: collegeRows.length > 0 ? String(collegeRows[0].id) : ''
         }));
       } catch (_error) {
         setColleges([]);
-        setCourses([]);
       }
     }
 
@@ -66,8 +57,7 @@ function Register() {
         ...form,
         year_no: Number(form.year_no),
         sem_no: Number(form.sem_no),
-        college_id: Number(form.college_id),
-        course_id: Number(form.course_id)
+        college_id: Number(form.college_id)
       });
       navigate('/login');
     } catch (requestError) {
@@ -94,15 +84,6 @@ function Register() {
           {colleges.map((college) => (
             <option key={college.id} value={college.id}>
               {college.name}
-            </option>
-          ))}
-        </select>
-
-        <select className="select" name="course_id" value={form.course_id} onChange={onChange} required>
-          <option value="" disabled>Select Enrolled Course</option>
-          {courses.map((course) => (
-            <option key={course.id} value={course.id}>
-              {course.code} - {course.name}
             </option>
           ))}
         </select>

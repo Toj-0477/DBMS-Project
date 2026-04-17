@@ -43,12 +43,12 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 
     const [studentCheck] = await db.execute(
-      'SELECT id FROM students WHERE id = ? AND course_id = ?',
-      [studentId, course_id]
+      'SELECT id FROM enrollments WHERE student_id = ? AND course_id = ? AND term = ?',
+      [studentId, course_id, term]
     );
 
     if (studentCheck.length === 0) {
-      return res.status(400).json({ message: 'Student is not enrolled in this specific course.' });
+      return res.status(400).json({ message: 'Student is not enrolled in this course for this term.' });
     }
 
     const [result] = await db.execute(
