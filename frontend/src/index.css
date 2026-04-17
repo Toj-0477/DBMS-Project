@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
+
+:root {
+  --bg: #f1f1f1;
+  --card: #ffffff;
+  --header: #000000;
+  --accent: #ffd700;
+  --quality: #00a67d;
+  --difficulty: #ff6961;
+  --helpfulness: #3f7cff;
+  --link: #0066ff;
+  --text: #141414;
+  --muted: #666666;
+  --border: #e4e4e4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(circle at 10% 10%, #fff8db, transparent 35%), var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.main-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 56px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #111;
+}
+
+.btn-dark {
+  background: #111;
+  color: #fff;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  border: 1px solid #d4d4d4;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  background: #fff;
+}
+
+.form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.page-title {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.page-subtitle {
+  margin: 0 0 24px;
+  color: var(--muted);
+}
+
+.badge-score {
+  min-width: 72px;
+  text-align: center;
+  border-radius: 12px;
+  padding: 12px 10px;
+  color: #fff;
+  font-weight: 800;
+}
+
+.badge-quality {
+  background: var(--quality);
+}
+
+.badge-difficulty {
+  background: var(--difficulty);
+}
+
+.badge-helpfulness {
+  background: var(--helpfulness);
+}
+
+.tag-pill {
+  background: #f6f6f6;
+  border: 1px solid #dedede;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.86rem;
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.6rem;
+  }
+
+  .main-wrap {
+    padding-top: 18px;
+  }
+}
