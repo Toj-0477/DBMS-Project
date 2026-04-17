@@ -78,6 +78,8 @@ CREATE TABLE ratings (
 );
 
 
+-- Dummy Data
+
 INSERT INTO college (name, parent_group) VALUES
 ('NMIMS',      'SVKM'),
 ('MPSTME',     'SVKM'),
