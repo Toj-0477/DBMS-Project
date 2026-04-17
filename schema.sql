@@ -3,6 +3,7 @@
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+/*
 DROP TABLE IF EXISTS enrollments;
 DROP TABLE IF EXISTS teaches;
 DROP TABLE IF EXISTS user_accounts;
@@ -12,6 +13,7 @@ DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS college;
 DROP TABLE IF EXISTS ratings;
 DROP TABLE IF EXISTS id_verifications;
+*/
 
 SET FOREIGN_KEY_CHECKS = 1;
 
