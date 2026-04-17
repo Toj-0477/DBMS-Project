@@ -13,6 +13,7 @@ function RateProfessor() {
   const [professor, setProfessor] = useState(null);
   const [teaches, setTeaches] = useState([]);
   const [selection, setSelection] = useState('');
+  const [term, setTerm] = useState('2026-SEM2');
   const [stars, setStars] = useState(4);
   const [comment, setComment] = useState('');
   const [busy, setBusy] = useState(false);
@@ -27,7 +28,7 @@ function RateProfessor() {
 
         if ((response.data.teaches || []).length > 0) {
           const first = response.data.teaches[0];
-          setSelection(`${first.course_id}||${first.term}`);
+          setSelection(String(first.course_id));
         }
       } catch (_error) {
         setError('Could not load professor details');
@@ -45,12 +46,10 @@ function RateProfessor() {
       return;
     }
 
-    if (!selection) {
-      setError('Please select a course and term');
+    if (!selection || !term.trim()) {
+      setError('Please select a course and enter a term');
       return;
     }
-
-    const [courseId, term] = selection.split('||');
 
     setBusy(true);
     setError('');
@@ -60,8 +59,8 @@ function RateProfessor() {
         `${API_BASE}/ratings`,
         {
           professor_id: Number(id),
-          course_id: Number(courseId),
-          term,
+          course_id: Number(selection),
+          term: term.trim(),
           stars: Number(stars),
           comment
         },
@@ -97,14 +96,19 @@ function RateProfessor() {
 
       <form className="form-grid" onSubmit={onSubmit}>
         <label>
-          Course + Term
+          Course
           <select className="select" value={selection} onChange={(event) => setSelection(event.target.value)}>
             {teaches.map((item) => (
-              <option key={`${item.course_id}-${item.term}`} value={`${item.course_id}||${item.term}`}>
-                {item.code} - {item.name} ({item.term})
+              <option key={item.course_id} value={item.course_id}>
+                {item.code} - {item.name}
               </option>
             ))}
           </select>
+        </label>
+
+        <label>
+          Term
+          <input className="input" type="text" value={term} onChange={(e) => setTerm(e.target.value)} required />
         </label>
 
         <label>

@@ -8,11 +8,11 @@ const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/signup', async (req, res) => {
-  const { name, email, roll_no, year_no, sem_no, college_id, password } = req.body;
+  const { name, email, roll_no, year_no, sem_no, college_id, course_id, password } = req.body;
 
-  if (!name || !email || !roll_no || !year_no || !sem_no || !college_id || !password) {
+  if (!name || !email || !roll_no || !year_no || !sem_no || !college_id || !course_id || !password) {
     return res.status(400).json({
-      message: 'name, email, roll_no, year_no, sem_no, college_id, password are required'
+      message: 'name, email, roll_no, year_no, sem_no, college_id, course_id, password are required'
     });
   }
 
@@ -22,15 +22,12 @@ router.post('/signup', async (req, res) => {
       return res.status(409).json({ message: 'Email or roll number already exists' });
     }
 
-    const [studentResult] = await db.execute(
-      'INSERT INTO students (name, roll_no, email, year_no, sem_no, college_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, roll_no, email, year_no, sem_no, college_id]
-    );
-
-    const studentId = studentResult.insertId;
     const passwordHash = await bcrypt.hash(password, 10);
 
-    await db.execute('INSERT INTO user_accounts (student_id, password_hash) VALUES (?, ?)', [studentId, passwordHash]);
+    const [studentResult] = await db.execute(
+      'INSERT INTO students (name, roll_no, email, password_hash, year_no, sem_no, college_id, course_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [name, roll_no, email, passwordHash, year_no, sem_no, college_id, course_id]
+    );
 
     return res.status(201).json({ message: 'Signup successful' });
   } catch (error) {
@@ -56,11 +53,10 @@ router.post('/login', async (req, res) => {
          s.year_no,
          s.sem_no,
          s.college_id,
+         s.course_id,
          c.name AS college,
-         ua.id AS account_id,
-         ua.password_hash
+         s.password_hash
        FROM students s
-       JOIN user_accounts ua ON ua.student_id = s.id
        JOIN college c ON c.id = s.college_id
        WHERE s.email = ?`,
       [email]
@@ -79,7 +75,6 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       {
-        accountId: user.account_id,
         studentId: user.student_id,
         email: user.email,
         name: user.name
@@ -98,6 +93,7 @@ router.post('/login', async (req, res) => {
         year_no: user.year_no,
         sem_no: user.sem_no,
         college_id: user.college_id,
+        course_id: user.course_id,
         college: user.college
       }
     });
@@ -118,6 +114,7 @@ router.get('/me', authMiddleware, async (req, res) => {
          s.year_no,
          s.sem_no,
          s.college_id,
+         s.course_id,
          c.name AS college
        FROM students s
        JOIN college c ON c.id = s.college_id

@@ -8,6 +8,8 @@ function Register() {
   const navigate = useNavigate();
 
   const [colleges, setColleges] = useState([]);
+  const [courses, setCourses] = useState([]);
+  
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -15,26 +17,39 @@ function Register() {
     year_no: '',
     sem_no: '',
     college_id: '',
+    course_id: '',
     password: ''
   });
+  
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    async function loadColleges() {
+    async function loadData() {
       try {
-        const response = await axios.get(`${API_BASE}/academic/colleges`);
-        const rows = response.data.colleges || [];
-        setColleges(rows);
-        if (rows.length > 0) {
-          setForm((prev) => ({ ...prev, college_id: String(rows[0].id) }));
-        }
+        const [collegeRes, courseRes] = await Promise.all([
+          axios.get(`${API_BASE}/academic/colleges`),
+          axios.get(`${API_BASE}/academic/courses`)
+        ]);
+        
+        const collegeRows = collegeRes.data.colleges || [];
+        const courseRows = courseRes.data.courses || [];
+        
+        setColleges(collegeRows);
+        setCourses(courseRows);
+        
+        setForm((prev) => ({ 
+          ...prev, 
+          college_id: collegeRows.length > 0 ? String(collegeRows[0].id) : '',
+          course_id: courseRows.length > 0 ? String(courseRows[0].id) : ''
+        }));
       } catch (_error) {
         setColleges([]);
+        setCourses([]);
       }
     }
 
-    loadColleges();
+    loadData();
   }, []);
 
   const onChange = (event) => {
@@ -51,7 +66,8 @@ function Register() {
         ...form,
         year_no: Number(form.year_no),
         sem_no: Number(form.sem_no),
-        college_id: Number(form.college_id)
+        college_id: Number(form.college_id),
+        course_id: Number(form.course_id)
       });
       navigate('/login');
     } catch (requestError) {
@@ -67,16 +83,26 @@ function Register() {
       <p className="page-subtitle">Create student account for feedback</p>
 
       <form className="form-grid" onSubmit={onSubmit}>
-        <input className="input" name="name" placeholder="Student Name" value={form.name} onChange={onChange} />
-        <input className="input" name="email" type="email" placeholder="Email" value={form.email} onChange={onChange} />
-        <input className="input" name="roll_no" placeholder="Roll No" value={form.roll_no} onChange={onChange} />
-        <input className="input" name="year_no" type="number" min="1" max="5" placeholder="Year" value={form.year_no} onChange={onChange} />
-        <input className="input" name="sem_no" type="number" min="1" max="10" placeholder="Semester" value={form.sem_no} onChange={onChange} />
+        <input className="input" name="name" placeholder="Student Name" value={form.name} onChange={onChange} required />
+        <input className="input" name="email" type="email" placeholder="Email" value={form.email} onChange={onChange} required />
+        <input className="input" name="roll_no" placeholder="Roll No" value={form.roll_no} onChange={onChange} required />
+        <input className="input" name="year_no" type="number" min="1" max="5" placeholder="Year" value={form.year_no} onChange={onChange} required />
+        <input className="input" name="sem_no" type="number" min="1" max="10" placeholder="Semester" value={form.sem_no} onChange={onChange} required />
 
-        <select className="select" name="college_id" value={form.college_id} onChange={onChange}>
+        <select className="select" name="college_id" value={form.college_id} onChange={onChange} required>
+          <option value="" disabled>Select College</option>
           {colleges.map((college) => (
             <option key={college.id} value={college.id}>
               {college.name}
+            </option>
+          ))}
+        </select>
+
+        <select className="select" name="course_id" value={form.course_id} onChange={onChange} required>
+          <option value="" disabled>Select Enrolled Course</option>
+          {courses.map((course) => (
+            <option key={course.id} value={course.id}>
+              {course.code} - {course.name}
             </option>
           ))}
         </select>
@@ -88,6 +114,7 @@ function Register() {
           placeholder="Set Password"
           value={form.password}
           onChange={onChange}
+          required
         />
 
         {error ? <p style={{ color: '#b00020', margin: 0 }}>{error}</p> : null}

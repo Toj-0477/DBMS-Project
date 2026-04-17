@@ -33,22 +33,22 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 
   try {
-    const [teachesRows] = await db.execute(
-      'SELECT id FROM teaches WHERE professor_id = ? AND course_id = ? AND term = ?',
-      [professor_id, course_id, term]
+    const [courseCheck] = await db.execute(
+      'SELECT id FROM courses WHERE id = ? AND professor_id = ?',
+      [course_id, professor_id]
     );
 
-    if (teachesRows.length === 0) {
-      return res.status(400).json({ message: 'Professor is not mapped to this course for this term' });
+    if (courseCheck.length === 0) {
+      return res.status(400).json({ message: 'Professor is not assigned to this course.' });
     }
 
-    const [enrollmentRows] = await db.execute(
-      'SELECT id FROM enrollments WHERE student_id = ? AND course_id = ? AND term = ?',
-      [studentId, course_id, term]
+    const [studentCheck] = await db.execute(
+      'SELECT id FROM students WHERE id = ? AND course_id = ?',
+      [studentId, course_id]
     );
 
-    if (enrollmentRows.length === 0) {
-      return res.status(400).json({ message: 'Student is not enrolled in this course for this term' });
+    if (studentCheck.length === 0) {
+      return res.status(400).json({ message: 'Student is not enrolled in this specific course.' });
     }
 
     const [result] = await db.execute(

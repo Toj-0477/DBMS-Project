@@ -67,11 +67,10 @@ router.get('/:id', async (req, res) => {
     }
 
     const [teachingRows] = await db.execute(
-      `SELECT t.term, cr.id AS course_id, cr.code, cr.name
-       FROM teaches t
-       JOIN courses cr ON cr.id = t.course_id
-       WHERE t.professor_id = ?
-       ORDER BY t.term DESC, cr.code ASC`,
+      `SELECT cr.id AS course_id, cr.code, cr.name
+       FROM courses cr
+       WHERE cr.professor_id = ?
+       ORDER BY cr.code ASC`,
       [professorId]
     );
 
