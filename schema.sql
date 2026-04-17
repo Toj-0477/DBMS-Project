@@ -94,3 +94,51 @@ INSERT INTO college (name, parent_group) VALUES
 ('DJ Sanghvi', 'SVKM'),
 ('SOBA', 'SVKM'),
 ('AMSOC', 'SVKM');
+
+-- Demo data for class show-and-tell
+-- Assumes this file is run on a fresh database.
+
+INSERT INTO professors (name, email, dept, college_id) VALUES
+('Dr Mehta', 'mehta@nmims.edu', 'Computer', 1),
+('Prof Iyer', 'iyer@mpstme.edu', 'Data Science', 2),
+('Prof Kulkarni', 'kulkarni@djsce.edu', 'Electronics', 3),
+('Prof Shah', 'shah@soba.edu', 'Business', 4),
+('Prof Desai', 'desai@amsoc.edu', 'Finance', 5);
+
+INSERT INTO courses (code, name, sem_no, credits, college_id) VALUES
+('CS201', 'Database Systems', 3, 4, 1),
+('DS301', 'Machine Learning Basics', 5, 4, 2),
+('EC202', 'Digital Logic', 3, 3, 3),
+('BA210', 'Marketing Fundamentals', 3, 3, 4),
+('FN305', 'Investment Analysis', 5, 4, 5);
+
+INSERT INTO students (name, roll_no, email, year_no, college_id) VALUES
+('Aarav Shah', 'NM001', 'aarav@nmims.edu', 2, 1),
+('Riya Patel', 'NM002', 'riya@nmims.edu', 2, 1),
+('Kabir Nair', 'MP001', 'kabir@mpstme.edu', 3, 2),
+('Anaya Joshi', 'DJ001', 'anaya@djsce.edu', 2, 3),
+('Neha Kapoor', 'SO001', 'neha@soba.edu', 2, 4),
+('Vikram Rao', 'AM001', 'vikram@amsoc.edu', 3, 5);
+
+INSERT INTO teaches (professor_id, course_id, term) VALUES
+(1, 1, '2026-SEM2'),
+(2, 2, '2026-SEM2'),
+(3, 3, '2026-SEM2'),
+(4, 4, '2026-SEM2'),
+(5, 5, '2026-SEM2');
+
+INSERT INTO enrollments (student_id, course_id, term, grade) VALUES
+(1, 1, '2026-SEM2', NULL),
+(2, 1, '2026-SEM2', NULL),
+(3, 2, '2026-SEM2', NULL),
+(4, 3, '2026-SEM2', NULL),
+(5, 4, '2026-SEM2', NULL),
+(6, 5, '2026-SEM2', NULL);
+
+INSERT INTO ratings (student_id, professor_id, course_id, term, stars, comment) VALUES
+(1, 1, 1, '2026-SEM2', 5, 'Very clear explanations and good pace'),
+(2, 1, 1, '2026-SEM2', 4, 'Helpful in practical sessions'),
+(3, 2, 2, '2026-SEM2', 5, 'Great examples in class'),
+(4, 3, 3, '2026-SEM2', 4, 'Concepts explained well'),
+(5, 4, 4, '2026-SEM2', 3, 'Good but assignment heavy'),
+(6, 5, 5, '2026-SEM2', 4, 'Useful for exam preparation');
