@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS professors;
 DROP TABLE IF EXISTS courses;
 DROP TABLE IF EXISTS college;
 DROP TABLE IF EXISTS ratings;
+DROP TABLE IF EXISTS id_verifications;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -28,6 +29,7 @@ CREATE TABLE students (
   year_no INT,
   sem_no INT,
   college_id INT NOT NULL,
+  is_verified BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (college_id) REFERENCES college(id)
 );
 
@@ -96,6 +98,17 @@ CREATE TABLE ratings (
   FOREIGN KEY (professor_id) REFERENCES professors(id),
   FOREIGN KEY (course_id) REFERENCES courses(id),
   CHECK (stars BETWEEN 1 AND 5)
+);
+
+CREATE TABLE id_verifications (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  image_path VARCHAR(255) NOT NULL,
+  extracted_text TEXT,
+  matched_college VARCHAR(100),
+  status VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES students(id)
 );
 
 INSERT INTO college (name, parent_group) VALUES

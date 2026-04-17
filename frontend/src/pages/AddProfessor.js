@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -11,12 +11,28 @@ function AddProfessor() {
 
   const [form, setForm] = useState({
     name: '',
-    department: '',
-    course: '',
-    college: ''
+    dept: '',
+    college_id: ''
   });
+  const [colleges, setColleges] = useState([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    async function loadColleges() {
+      try {
+        const response = await axios.get(`${API_BASE}/academic/colleges`);
+        const collegeList = response.data.colleges || [];
+        setColleges(collegeList);
+        if (collegeList.length > 0) {
+          setForm((prev) => ({ ...prev, college_id: collegeList[0].id }));
+        }
+      } catch (err) {
+        console.error('Failed to load colleges', err);
+      }
+    }
+    loadColleges();
+  }, []);
 
   const onChange = (event) => {
     setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
@@ -31,7 +47,7 @@ function AddProfessor() {
       const response = await axios.post(`${API_BASE}/professors`, form, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      navigate(`/professors/${response.data.professorId}`);
+      navigate(`/feedback/${response.data.id}`);
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Failed to add professor');
     } finally {
@@ -45,16 +61,21 @@ function AddProfessor() {
       <p className="page-subtitle">Only verified users can publish new professor records.</p>
 
       <form className="form-grid" onSubmit={onSubmit}>
-        <input className="input" name="name" placeholder="Professor name" value={form.name} onChange={onChange} />
+        <input className="input" name="name" placeholder="Professor name" value={form.name} onChange={onChange} required />
         <input
           className="input"
-          name="department"
+          name="dept"
           placeholder="Department"
-          value={form.department}
+          value={form.dept}
           onChange={onChange}
         />
-        <input className="input" name="course" placeholder="Course" value={form.course} onChange={onChange} />
-        <input className="input" name="college" placeholder="College" value={form.college} onChange={onChange} />
+        <select className="select" name="college_id" value={form.college_id} onChange={onChange} required>
+          {colleges.map((col) => (
+            <option key={col.id} value={col.id}>
+              {col.name} ({col.parent_group})
+            </option>
+          ))}
+        </select>
         {error && <p style={{ color: '#b00020', margin: 0 }}>{error}</p>}
         <button className="btn btn-dark" type="submit" disabled={busy}>
           {busy ? 'Saving...' : 'Add Professor'}
@@ -65,3 +86,4 @@ function AddProfessor() {
 }
 
 export default AddProfessor;
+

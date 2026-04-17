@@ -64,11 +64,11 @@ router.post('/upload', authMiddleware, upload.single('idCard'), async (req, res)
       `INSERT INTO id_verifications
        (user_id, image_path, extracted_text, matched_college, status)
        VALUES (?, ?, ?, ?, ?)`,
-      [req.user.id, relativePath, extractedText, result.matchedCollege, result.status]
+      [req.user.studentId, relativePath, extractedText, result.matchedCollege, result.status]
     );
 
     if (result.status === 'approved') {
-      await db.execute('UPDATE users SET is_verified = TRUE WHERE id = ?', [req.user.id]);
+      await db.execute('UPDATE students SET is_verified = TRUE WHERE id = ?', [req.user.studentId]);
     }
 
     return res.json({
